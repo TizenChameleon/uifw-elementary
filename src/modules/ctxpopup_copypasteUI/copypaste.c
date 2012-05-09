@@ -88,9 +88,16 @@ _entry_hide_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
 }
 
 static void
-_entry_move_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_entry_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   _ctxpopup_hide(data);
+   if (evas_pointer_button_down_mask_get(e))
+     _ctxpopup_hide(data);
+   else
+     {
+        /*update*/
+        elm_entry_extension_module_data_get(obj, ext_mod);
+        _ctxpopup_position(data);
+     }
 }
 
 static void
