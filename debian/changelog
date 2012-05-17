@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.70492slp2+build04) unstable; urgency=low
+
+  * Upload Package
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.70492slp2+build04
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Thu, 17 May 2012 19:04:44 +0900
+
 elementary (1.0.0+svn.70492slp2+build03) unstable; urgency=low
 
   * Upload Package
