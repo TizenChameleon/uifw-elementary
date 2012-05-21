@@ -2840,7 +2840,6 @@ _elm_entry_text_set(Evas_Object *obj, const char *item, const char *entry)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   evas_event_freeze(evas_object_evas_get(obj));
    if (!entry) entry = "";
    if (item && strcmp(item, "default"))
      {
@@ -2848,6 +2847,7 @@ _elm_entry_text_set(Evas_Object *obj, const char *item, const char *entry)
         return;
      }
 
+   evas_event_freeze(evas_object_evas_get(obj));
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
    if (wd->password_text) eina_stringshare_del(wd->password_text);
