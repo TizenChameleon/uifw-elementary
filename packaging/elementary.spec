@@ -1,7 +1,7 @@
 #sbs-git:slp/pkgs/e/elementary elementary 1.0.0+svn.67547slp2+build16 598cc91bf431f150cf48064ab672b1e4df5dc4a2
 Name:       elementary
 Summary:    EFL toolkit for small touchscreens
-Version:    1.0.0+svn.70492slp2+build05
+Version:    1.0.0+svn.70492slp2+build06
 Release:    1
 Group:      System/Libraries
 License:    LGPLv2.1
@@ -86,7 +86,9 @@ desktop-file-install --delete-original       \
 /usr/lib/libelementary*
 /usr/lib/elementary/modules/*/*/*.so
 /usr/lib/edje/modules/elm/*/module.so
-/usr/share/*
+/usr/share/elementary/*
+/usr/share/icons/*
+/usr/share/locale/*
 
 %files devel
 %defattr(-,root,root,-)
