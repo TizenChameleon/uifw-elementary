@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.70492slp2+build08) unstable; urgency=low
+
+  * Add extension profile and change prfile name from slp to mobile
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.70492slp2+build08
+
+ -- Seunggyun Kim <sgyun.kim@samsung.com>  Thu, 31 May 2012 20:15:34 +0900
+
 elementary (1.0.0+svn.70492slp2+build07) unstable; urgency=low
 
   * Upload Package

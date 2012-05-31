@@ -1,5 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
-SUBDIRS = default standard illume slp
+SUBDIRS = default standard illume mobile extension
 
 EET_EET = @eet_eet@
 
