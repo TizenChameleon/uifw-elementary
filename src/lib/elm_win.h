@@ -1372,6 +1372,27 @@ EAPI Evas_Object *elm_win_inwin_content_get(const Evas_Object *obj);
 EAPI Evas_Object *elm_win_inwin_content_unset(Evas_Object *obj);
 
 /**
+ * Set the floating mode of a window.
+ *
+ * @param obj The window object
+ * @param floating If true, the window is floating mode
+ *
+ * @ingroup Win
+ */
+EAPI void                  elm_win_floating_mode_set(Evas_Object *obj, Eina_Bool floating);
+
+/**
+ * Get the floating mode of a window.
+ *
+ * @param obj The window object
+ * @return If true, the window is floating mode
+ *
+ * @ingroup Win
+ */
+EAPI Eina_Bool             elm_win_floating_mode_get(const Evas_Object *obj);
+
+
+/**
  * @}
  */
 
