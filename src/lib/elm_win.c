@@ -79,6 +79,7 @@ struct _Elm_Win
    Eina_Bool fullscreen : 1;
    Eina_Bool maximized : 1;
    Eina_Bool skip_focus : 1;
+   Eina_Bool floating : 1;
 };
 
 static const char *widtype = NULL;
@@ -3447,3 +3448,40 @@ elm_win_xwindow_get(const Evas_Object *obj)
 #endif
    return 0;
 }
+
+EAPI void
+elm_win_floating_mode_set(Evas_Object *obj, Eina_Bool floating)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   win = elm_widget_data_get(obj);
+   if (!win) return;
+   if (floating == win->floating) return;
+#ifdef HAVE_ELEMENTARY_X
+   _elm_win_xwindow_get(win);
+#endif
+   win->floating = floating;
+#ifdef HAVE_ELEMENTARY_X
+   if (win->xwin)
+     {
+        if (win->floating)
+          ecore_x_e_illume_window_state_set
+             (win->xwin, ECORE_X_ILLUME_WINDOW_STATE_FLOATING);
+        else
+          ecore_x_e_illume_window_state_set
+             (win->xwin, ECORE_X_ILLUME_WINDOW_STATE_NORMAL);
+     }
+#endif
+}
+
+EAPI Eina_Bool
+elm_win_floating_mode_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   win = elm_widget_data_get(obj);
+   if (!win) return EINA_FALSE;
+
+   return win->floating;
+}
+
