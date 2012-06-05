@@ -1719,7 +1719,7 @@ _overlay_group_new(Widget_Data *wd)
    grp->overlay->type = ELM_MAP_OVERLAY_TYPE_GROUP;
    grp->overlay->ovl = grp;
    Color c = {0x90, 0xee, 0x90, 0xff};
-   grp->ovl = _overlay_default_new(grp->overlay, -1, -1, c, 2);
+   grp->ovl = _overlay_default_new(grp->overlay, -1, -1, c, 1);
    return grp;
 }
 
