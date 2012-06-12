@@ -302,6 +302,9 @@ obj_unhook(Elm_Datetime_Module_Data *module_data)
    ctx_mod = (Ctxpopup_Module_Data *)module_data;
    if (!ctx_mod) return;
 
+   evas_object_event_callback_del_full(elm_widget_top_get(module_data->base),
+                                       EVAS_CALLBACK_RESIZE,
+                                       _ctxpopup_parent_resize_cb, ctx_mod);
    if (ctx_mod->ctxpopup)
      evas_object_del(ctx_mod->ctxpopup);
 
