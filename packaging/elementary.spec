@@ -1,7 +1,7 @@
-#sbs-git:slp/pkgs/e/elementary elementary 1.0.0+svn.70492slp2+build09 5e043d36437f4c52c449ceccadfb5b378f92d94f
+#sbs-git:slp/pkgs/e/elementary elementary 1.0.0+svn.70492slp2+build09
 Name:       elementary
 Summary:    EFL toolkit for small touchscreens
-Version:    1.0.0+svn.70492slp2+build09
+Version:    1.0.0+svn.70492slp2+build10
 Release:    1
 Group:      System/Libraries
 License:    LGPLv2.1
@@ -9,28 +9,19 @@ URL:        http://trac.enlightenment.org/e/wiki/Elementary
 Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-BuildRequires:  pkgconfig(ecore)
-BuildRequires:  pkgconfig(ecore-evas)
-BuildRequires:  pkgconfig(ecore-fb)
-BuildRequires:  pkgconfig(ecore-file)
-BuildRequires:  pkgconfig(ecore-imf)
-BuildRequires:  pkgconfig(ecore-x)
-BuildRequires:  pkgconfig(edbus)
-BuildRequires:  pkgconfig(edje)
-BuildRequires:  pkgconfig(eet)
-BuildRequires:  pkgconfig(efreet)
-BuildRequires:  pkgconfig(eina)
-BuildRequires:  pkgconfig(ethumb)
-BuildRequires:  pkgconfig(evas)
-BuildRequires:  pkgconfig(appsvc)
-BuildRequires:  pkgconfig(libxml-2.0)
-BuildRequires:  pkgconfig(x11)
-BuildRequires:  pkgconfig(icu-i18n)
+BuildRequires:  gettext
 BuildRequires:  edje-tools
-BuildRequires:  embryo
 BuildRequires:  eet-tools
-BuildRequires:  libjpeg-devel
-BuildRequires:  desktop-file-utils
+BuildRequires:  eina-devel
+BuildRequires:  eet-devel
+BuildRequires:  evas-devel
+BuildRequires:  ecore-devel
+BuildRequires:  edje-devel
+BuildRequires:  edbus-devel
+BuildRequires:  efreet-devel
+BuildRequires:  ethumb-devel
+BuildRequires:  app-svc-devel
+BuildRequires:  libx11-devel
 
 %description
 Elementary - a basic widget set that is easy to use based on EFL for mobile This package contains devel content.
@@ -53,7 +44,6 @@ Obsoletes:  %{name}-bin
 %description tools
 EFL toolkit for small touchscreens (tools)
 
-
 %prep
 %setup -q
 
@@ -71,11 +61,6 @@ make %{?jobs:-j%jobs}
 %install
 rm -rf %{buildroot}
 %make_install
-
-desktop-file-install --delete-original       \
-  --dir %{buildroot}%{_datadir}/applications             \
-   %{buildroot}%{_datadir}/applications/*.desktop
-
 
 %post -p /sbin/ldconfig
 
