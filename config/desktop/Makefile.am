@@ -7,7 +7,7 @@ EXTRA_DIST = \
         icon.png \
 	base.src
 
-filesdir = $(datadir)/elementary/config/extension
+filesdir = $(datadir)/elementary/config/desktop
 files_DATA = \
         profile.desktop \
         icon.png \
@@ -15,7 +15,7 @@ files_DATA = \
 
 %.cfg: %.src
 	$(EET_EET) -e \
-	$(top_builddir)/config/extension/$@ config \
+	$(top_builddir)/config/desktop/$@ config \
 	$< 1
 
 clean-local:

@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.70492slp2+build10) unstable; urgency=low
+
+  * Change profile name from extension to desktop
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.70492slp2+build10
+
+ -- Seunggyun Kim <sgyun.kim@samsung.com>  Mon, 18 Jun 2012 10:38:44 +0900
+
 elementary (1.0.0+svn.70492slp2+build09) unstable; urgency=low
 
   * Add APIs for floating mode (app-in-app)

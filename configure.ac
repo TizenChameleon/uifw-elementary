@@ -730,7 +730,7 @@ config/default/Makefile
 config/standard/Makefile
 config/illume/Makefile
 config/mobile/Makefile
-config/extension/Makefile
+config/desktop/Makefile
 $po_makefile_in
 ])
 
