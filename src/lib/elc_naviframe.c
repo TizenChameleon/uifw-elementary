@@ -220,7 +220,7 @@ static void _emit_hook(Evas_Object *obj,
 {
    Elm_Object_Item *it = elm_naviframe_top_item_get(obj);
    if (!it) return;
-   return elm_object_item_signal_emit(it, emission, source);
+   elm_object_item_signal_emit(it, emission, source);
 }
 
 static void
