@@ -79,6 +79,7 @@
  * @li "unfullscreen": window has stopped being fullscreen
  * @li "maximized": window has been maximized
  * @li "unmaximized": window has stopped being maximized
+ * @li "profile,changed": window's profile has been changed
  *
  * Examples:
  * @li @ref win_example_01
@@ -692,6 +693,31 @@ EAPI void                  elm_win_withdrawn_set(Evas_Object *obj, Eina_Bool wit
  * @ingroup Win
  */
 EAPI Eina_Bool             elm_win_withdrawn_get(const Evas_Object *obj);
+
+/**
+ * Set the profile list of a window.
+ *
+ * @param obj The window object
+ * @param profiles The list of profile's name
+ * @param num_profiles The number of profile names
+ *
+ * @ingroup Win
+ */
+EAPI void                  elm_win_profiles_set(Evas_Object *obj, const char **profiles, unsigned int num_profiles);
+
+/**
+ * Get the profile of a window.
+ *
+ * The returned string is an internal one and should not be freed or
+ * modified. It will also be rendered invalid if a new role is set or if
+ * the window is destroyed.
+ *
+ * @param obj The window object
+ * @return The profile's name
+ *
+ * @ingroup Win
+ */
+EAPI const char           *elm_win_profile_get(const Evas_Object *obj);
 
 /**
  * Set the urgent state of a window.

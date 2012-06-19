@@ -138,6 +138,16 @@ EAPI void        elm_config_profile_list_free(Eina_List *l);
 EAPI void        elm_config_profile_set(const char *profile);
 
 /**
+ * Check if the given Elementary's profile exists.
+ *
+ * @param profile The profile's name
+ * @return EINA_TRUE if the profile exists, EINA_FALSE otherwise.
+ *
+ * @ingroup Profile
+ */
+EAPI Eina_Bool   elm_config_profile_exists(const char *profile);
+
+/**
  * @}
  */
 

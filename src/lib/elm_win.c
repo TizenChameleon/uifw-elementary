@@ -60,6 +60,12 @@ struct _Elm_Win
         Eina_Bool top_animate : 1;
         Eina_Bool geometry_changed : 1;
      } focus_highlight;
+   struct
+   {
+      const char  *name;
+      Ecore_Timer *timer;
+      Eina_List   *names;
+   } profile;
 
    Evas_Object *icon;
    const char *title;
@@ -129,6 +135,7 @@ static const char SIG_FULLSCREEN[] = "fullscreen";
 static const char SIG_UNFULLSCREEN[] = "unfullscreen";
 static const char SIG_MAXIMIZED[] = "maximized";
 static const char SIG_UNMAXIMIZED[] = "unmaximized";
+static const char SIG_PROFILE_CHANGED[] = "profile,changed";
 
 static const Evas_Smart_Cb_Description _signals[] = {
    {SIG_DELETE_REQUEST, ""},
@@ -144,6 +151,7 @@ static const Evas_Smart_Cb_Description _signals[] = {
    {SIG_UNFULLSCREEN, ""},
    {SIG_MAXIMIZED, ""},
    {SIG_UNMAXIMIZED, ""},
+   {SIG_PROFILE_CHANGED, ""},
    {NULL, NULL}
 };
 
@@ -423,6 +431,57 @@ _elm_win_focus_out(Ecore_Evas *ee)
 }
 
 static void
+_elm_win_profile_update(Ecore_Evas *ee)
+{
+   Evas_Object *obj = ecore_evas_object_associate_get(ee);
+   Elm_Win *win;
+
+   if (!obj) return;
+   win = elm_widget_data_get(obj);
+   if (!win) return;
+
+   if (win->profile.timer)
+     ecore_timer_del(win->profile.timer);
+   win->profile.timer = NULL;
+
+   /* TODO: We need the ability to bind a profile to a specific window.
+    * Elementary's configuration still has a single global profile for the app.
+    */
+   _elm_config_profile_set(win->profile.name);
+
+   evas_object_smart_callback_call(win->win_obj, SIG_PROFILE_CHANGED, NULL);
+}
+
+static Eina_Bool
+_elm_win_profile_change_delay(void *data)
+{
+   Elm_Win *win = data;
+   const char *profile;
+   Eina_Bool changed = EINA_FALSE;
+
+   profile = eina_list_nth(win->profile.names, 0);
+   if (profile)
+     {
+        if (win->profile.name)
+          {
+             if (strcmp(win->profile.name, profile))
+               {
+                  eina_stringshare_replace(&(win->profile.name), profile);
+                  changed = EINA_TRUE;
+               }
+          }
+        else
+          {
+             win->profile.name = eina_stringshare_add(profile);
+             changed = EINA_TRUE;
+          }
+     }
+   win->profile.timer = NULL;
+   if (changed) _elm_win_profile_update(win->ee);
+   return EINA_FALSE;
+}
+
+static void
 _elm_win_state_change(Ecore_Evas *ee)
 {
    Evas_Object *obj;
@@ -432,6 +491,8 @@ _elm_win_state_change(Ecore_Evas *ee)
    Eina_Bool ch_iconified = EINA_FALSE;
    Eina_Bool ch_fullscreen = EINA_FALSE;
    Eina_Bool ch_maximized = EINA_FALSE;
+   Eina_Bool ch_profile = EINA_FALSE;
+   const char *profile;
 
    if (!(obj = ecore_evas_object_associate_get(ee))) return;
 
@@ -462,6 +523,24 @@ _elm_win_state_change(Ecore_Evas *ee)
         win->maximized = ecore_evas_maximized_get(win->ee);
         ch_maximized = EINA_TRUE;
      }
+   profile = ecore_evas_profile_get(win->ee);
+   if ((profile) &&
+       _elm_config_profile_exists(profile))
+     {
+        if (win->profile.name)
+          {
+             if (strcmp(win->profile.name, profile))
+               {
+                  eina_stringshare_replace(&(win->profile.name), profile);
+                  ch_profile = EINA_TRUE;
+               }
+          }
+        else
+          {
+             win->profile.name = eina_stringshare_add(profile);
+             ch_profile = EINA_TRUE;
+          }
+     }
    if ((ch_withdrawn) || (ch_iconified))
      {
         if (win->withdrawn)
@@ -491,6 +570,10 @@ _elm_win_state_change(Ecore_Evas *ee)
           evas_object_smart_callback_call(win->win_obj, SIG_MAXIMIZED, NULL);
         else
           evas_object_smart_callback_call(win->win_obj, SIG_UNMAXIMIZED, NULL);
+     }
+   if (ch_profile)
+     {
+        _elm_win_profile_update(win->ee);
      }
 }
 
@@ -616,6 +699,7 @@ _elm_win_obj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_inf
 {
    Elm_Win *win = data;
    Evas_Object *child, *child2 = NULL;
+   const char *str;
 
    if (win->parent)
      {
@@ -700,6 +784,10 @@ _elm_win_obj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_inf
    if (win->icon_name) eina_stringshare_del(win->icon_name);
    if (win->role) eina_stringshare_del(win->role);
    if (win->icon) evas_object_del(win->icon);
+
+   EINA_LIST_FREE(win->profile.names, str) eina_stringshare_del(str);
+   if (win->profile.name) eina_stringshare_del(win->profile.name);
+   if (win->profile.timer) ecore_timer_del(win->profile.timer);
 
    free(win);
 
@@ -2535,6 +2623,69 @@ elm_win_withdrawn_get(const Evas_Object *obj)
    win = elm_widget_data_get(obj);
    if (!win) return EINA_FALSE;
    return win->withdrawn;
+}
+
+EAPI void
+elm_win_profiles_set(Evas_Object *obj, const char **profiles, unsigned int num_profiles)
+{
+   Elm_Win *win;
+   char **profiles_int;
+   const char *str;
+   unsigned int i, num;
+   Eina_List *l;
+
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   win = elm_widget_data_get(obj);
+   if (!win) return;
+   if (!profiles) return;
+
+   if (win->profile.timer) ecore_timer_del(win->profile.timer);
+   win->profile.timer = ecore_timer_add(0.1, _elm_win_profile_change_delay, win);
+   EINA_LIST_FREE(win->profile.names, str) eina_stringshare_del(str);
+
+   for (i = 0; i < num_profiles; i++)
+     {
+        if ((profiles[i]) &&
+            _elm_config_profile_exists(profiles[i]))
+          {
+             str = eina_stringshare_add(profiles[i]);
+             win->profile.names = eina_list_append(win->profile.names, str);
+          }
+     }
+
+   num = eina_list_count(win->profile.names);
+   profiles_int = alloca(num * sizeof(char *));
+
+   if (profiles_int)
+     {
+        i = 0;
+        EINA_LIST_FOREACH(win->profile.names, l, str)
+          {
+             if (str)
+               profiles_int[i] = strdup(str);
+             else
+               profiles_int[i] = NULL;
+             i++;
+          }
+        ecore_evas_profiles_set(win->ee, (const char **)profiles_int, i);
+        for (i = 0; i < num; i++)
+          {
+             if (profiles_int[i]) free(profiles_int[i]);
+          }
+     }
+   else
+     ecore_evas_profiles_set(win->ee, profiles, num_profiles);
+}
+
+EAPI const char *
+elm_win_profile_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   win = elm_widget_data_get(obj);
+   if (!win) return NULL;
+
+   return win->profile.name;
 }
 
 EAPI void
