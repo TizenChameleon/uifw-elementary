@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.70492slp2+build11) natty; urgency=low
+
+  * [elm_win][elm_config] Added per-window profile to support
+    multi-head display.
+    [elc_naviframe] Return statement wrongly added in a void function
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.70492slp2+build11
+
+ -- Gwanglim Lee <gl77.lee@samsung.com>  Wed, 20 Jun 2012 17:09:39 +0900
+
 elementary (1.0.0+svn.70492slp2+build10) unstable; urgency=low
 
   * Change profile name from extension to desktop
