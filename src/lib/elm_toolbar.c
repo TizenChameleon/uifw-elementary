@@ -1322,7 +1322,7 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
         edje_object_part_text_escaped_set(VIEW(it), "elm.text", it->label);
         edje_object_signal_emit(VIEW(it), "elm,state,text,visible", "elm");
      }
-   mw = mh = minw = minh = -1;
+   mw = mh = -1;
    if (!it->separator && !it->object)
      elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    edje_object_size_min_restricted_calc(VIEW(it), &mw, &mh, mw, mh);
