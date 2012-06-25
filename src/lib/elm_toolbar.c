@@ -345,7 +345,7 @@ _theme_hook_item(Evas_Object *obj, Elm_Toolbar_Item *it, double scale, int icon_
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *view = VIEW(it);
-   Evas_Coord mw, mh;
+   Evas_Coord mw, mh, minw, minh;
    const char *style = elm_widget_style_get(obj);
 
    _mirrored_set_item(obj, it, elm_widget_mirrored_get(obj));
@@ -397,13 +397,19 @@ _theme_hook_item(Evas_Object *obj, Elm_Toolbar_Item *it, double scale, int icon_
           }
      }
 
-   mw = mh = -1;
+   mw = mh = minw = minh = -1;
    if (!it->separator && !it->object)
      elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    edje_object_size_min_restricted_calc(view, &mw, &mh, mw, mh);
    if (!it->separator && !it->object)
      elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-   evas_object_size_hint_min_set(view, mw, mh);
+   evas_object_size_hint_min_get(view, &minw, &minh);
+   if ((minw < mw) && (minh < mh))
+     evas_object_size_hint_min_set(view, mw, mh);
+   else if ((minw < mw) && (minh > mh))
+     evas_object_size_hint_min_set(view, mw, minh);
+   else if ((minw > mw) && (minh < mh))
+     evas_object_size_hint_min_set(view, minw, mh);
 }
 
 static void
@@ -1316,10 +1322,12 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
         edje_object_part_text_escaped_set(VIEW(it), "elm.text", it->label);
         edje_object_signal_emit(VIEW(it), "elm,state,text,visible", "elm");
      }
-   mw = mh = -1;
-   elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+   mw = mh = minw = minh = -1;
+   if (!it->separator && !it->object)
+     elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    edje_object_size_min_restricted_calc(VIEW(it), &mw, &mh, mw, mh);
-   elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+   if (!it->separator && !it->object)
+     elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    if (wd->shrink_mode != ELM_TOOLBAR_SHRINK_EXPAND)
      {
         if (wd->vertical)
@@ -1350,7 +1358,7 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
 static void
 _elm_toolbar_item_label_update(Elm_Toolbar_Item *item)
 {
-   Evas_Coord mw = -1, mh = -1;
+   Evas_Coord mw = -1, mh = -1, minw = -1, minh = -1;
    Widget_Data *wd = elm_widget_data_get(WIDGET(item));
    edje_object_part_text_escaped_set(VIEW(item), "elm.text", item->label);
    edje_object_signal_emit(VIEW(item), "elm,state,text,visible", "elm");
@@ -1376,7 +1384,13 @@ _elm_toolbar_item_label_update(Elm_Toolbar_Item *item)
         evas_object_size_hint_weight_set(VIEW(item), EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(VIEW(item), EVAS_HINT_FILL, EVAS_HINT_FILL);
      }
-   evas_object_size_hint_min_set(VIEW(item), mw, mh);
+   evas_object_size_hint_min_get(VIEW(item), &minw, &minh);
+   if ((minw < mw) && (minh < mh))
+     evas_object_size_hint_min_set(VIEW(item), mw, mh);
+   else if ((minw < mw) && (minh > mh))
+     evas_object_size_hint_min_set(VIEW(item), mw, minh);
+   else if ((minw > mw) && (minh < mh))
+     evas_object_size_hint_min_set(VIEW(item), minw, mh);
 }
 
 static void
@@ -1416,7 +1430,7 @@ _elm_toolbar_item_icon_update(Elm_Toolbar_Item *item)
 {
    Elm_Toolbar_Item_State *it_state;
    Eina_List *l;
-   Evas_Coord mw = -1, mh = -1;
+   Evas_Coord mw = -1, mh = -1, minw = -1, minh = -1;
    Widget_Data *wd = elm_widget_data_get(WIDGET(item));
    Evas_Object *old_icon = edje_object_part_swallow_get(VIEW(item),
                                                         "elm.swallow.icon");
@@ -1445,7 +1459,13 @@ _elm_toolbar_item_icon_update(Elm_Toolbar_Item *item)
         evas_object_size_hint_weight_set(VIEW(item), EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(VIEW(item), EVAS_HINT_FILL, EVAS_HINT_FILL);
      }
-   evas_object_size_hint_min_set(VIEW(item), mw, mh);
+   evas_object_size_hint_min_get(VIEW(item), &minw, &minh);
+   if ((minw < mw) && (minh < mh))
+     evas_object_size_hint_min_set(VIEW(item), mw, mh);
+   else if ((minw < mw) && (minh > mh))
+     evas_object_size_hint_min_set(VIEW(item), mw, minh);
+   else if ((minw > mw) && (minh < mh))
+     evas_object_size_hint_min_set(VIEW(item), minw, mh);
 
    EINA_LIST_FOREACH(item->states, l, it_state)
      {
@@ -1967,6 +1987,7 @@ elm_toolbar_item_separator_set(Elm_Object_Item *it, Eina_Bool separator)
    item->separator = separator;
    scale = (elm_widget_scale_get(obj) * _elm_config->scale);
    _theme_hook_item(obj, item, scale, wd->icon_size);
+   evas_object_size_hint_min_set(VIEW(item), -1, -1);
 }
 
 EAPI Eina_Bool
