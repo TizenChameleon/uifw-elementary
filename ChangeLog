@@ -215,3 +215,23 @@
 
 	* Genlist: Fixed tree expand bug. Check item type when an item is requested
 	to be expanded/contracted.
+
+2012-06-25  Carsten Haitzler (The Rasterman)
+
+	* add elm_cnp_selection_loss_callback_set() so you know when you
+        lose a selection as a client
+        * improve robustness of cnp to track target object deletions.
+
+2012-06-26  Shinwoo Kim (kimcinoo)
+
+	* Use Edje to enable accessibility on TEXTBLOCK.
+
+2012-06-27 Daniel Juyung Seo (SeoZ)
+
+	* Genlist: Fixed homogeneous mode bug with ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY item. Now it calculates display only item size correctly.
+
+2012-06-29 Artem Popov
+
+	* Add support for a new toolbar style with icon and text
+        aligned in center. "item_centered".
+
