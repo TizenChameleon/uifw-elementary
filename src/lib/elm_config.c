@@ -1737,6 +1737,7 @@ EAPI void
 elm_config_font_overlay_apply(void)
 {
    _elm_config_font_overlay_apply();
+   _elm_rescale();
 }
 // WRAPPER:: will be removed soon.
 EAPI Evas_Coord
