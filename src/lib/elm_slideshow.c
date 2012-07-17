@@ -502,7 +502,11 @@ elm_slideshow_item_show(Elm_Object_Item *it)
      wd->timer = ecore_timer_add(wd->timeout, _timer_cb, WIDGET(item));
    _item_realize(next);
    edje_object_part_swallow(wd->slideshow, "elm.swallow.2", VIEW(next));
-   snprintf(buf, sizeof(buf), "%s,next", wd->transition);
+
+   if (!wd->transition)
+     sprintf(buf, "none,next");
+   else
+     snprintf(buf, sizeof(buf), "%s,next", wd->transition);
    edje_object_signal_emit(wd->slideshow, buf, "slideshow");
    wd->previous = wd->current;
    wd->current = next;
@@ -535,7 +539,10 @@ elm_slideshow_next(Evas_Object *obj)
 
    edje_object_part_swallow(wd->slideshow, "elm.swallow.2", VIEW(next));
 
-   snprintf(buf, sizeof(buf), "%s,next", wd->transition);
+   if (!wd->transition)
+     sprintf(buf, "none,next");
+   else
+     snprintf(buf, sizeof(buf), "%s,next", wd->transition);
    edje_object_signal_emit(wd->slideshow, buf, "slideshow");
 
    wd->previous = wd->current;
@@ -569,7 +576,10 @@ elm_slideshow_previous(Evas_Object *obj)
 
    edje_object_part_swallow(wd->slideshow, "elm.swallow.2", VIEW(prev));
 
-   snprintf(buf, 1024, "%s,previous", wd->transition);
+   if (!wd->transition)
+     sprintf(buf, "none,previous");
+   else
+     snprintf(buf, sizeof(buf), "%s,previous", wd->transition);
    edje_object_signal_emit(wd->slideshow, buf, "slideshow");
 
    wd->previous = wd->current;
