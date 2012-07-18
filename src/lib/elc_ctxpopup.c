@@ -865,7 +865,12 @@ _theme_hook(Evas_Object *obj)
         *  So the first item separator should be invisible.
         */
        if ((idx++) == 0)
-         edje_object_signal_emit(VIEW(item), "elm,state,default", "elm");
+         {
+           if(!wd->horizontal)
+             edje_object_signal_emit(VIEW(item), "elm,state,default", "elm");
+           else
+             edje_object_signal_emit(VIEW(item), "elm,state,text_horizontal", "elm");
+         }
        else
          {
            if(!wd->horizontal)
@@ -1102,7 +1107,12 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
    EINA_LIST_FOREACH(wd->items, elist, item)
      {
        if (idx++ == 0)
-         edje_object_signal_emit(VIEW(item), "elm,state,default", "elm");
+         {
+           if(!wd->horizontal)
+             edje_object_signal_emit(VIEW(item), "elm,state,default", "elm");
+           else
+             edje_object_signal_emit(VIEW(item), "elm,state,text_horizontal", "elm");
+         }  
        else
          {
            if(!wd->horizontal)
@@ -1576,10 +1586,10 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 
         EINA_LIST_FOREACH(wd->items, elist, item)
           {
-             if (idx++ == 0)
-               edje_object_signal_emit(VIEW(item), "elm,state,default", "elm");
-             else
-               edje_object_signal_emit(VIEW(item), "elm,state,horizontal", "elm");
+            if (idx++ == 0)
+              edje_object_signal_emit(VIEW(item), "elm,state,text_horizontal", "elm");
+            else
+              edje_object_signal_emit(VIEW(item), "elm,state,horizontal", "elm");
           }
      }
 
