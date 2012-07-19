@@ -80,6 +80,7 @@ _mapbuf(Evas_Object *obj)
    Evas_Coord x, y, w, h;
    if (!wd) return;
    evas_object_geometry_get(wd->clip, &x, &y, &w, &h);
+   evas_object_resize(wd->content, w, h);
    if (wd->enabled)
      {
         Evas_Map *m;
@@ -97,7 +98,6 @@ _mapbuf(Evas_Object *obj)
         evas_object_map_set(wd->content, NULL);
         evas_object_map_enable_set(wd->content, EINA_FALSE);
         evas_object_move(wd->content, x, y);
-        evas_object_resize(wd->content, w, h);
      }
 }
 
@@ -127,7 +127,6 @@ _configure(Evas_Object *obj)
                   evas_nochange_pop(e);
                }
           }
-        evas_object_resize(wd->content, w, h);
         _mapbuf(obj);
      }
 }
