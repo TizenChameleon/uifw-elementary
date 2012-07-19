@@ -68,6 +68,9 @@ _sizing_eval(Evas_Object *obj)
    _els_smart_icon_scale_down_set(wd->img, wd->scale_down);
    _els_smart_icon_smooth_scale_set(wd->img, wd->smooth);
    _els_smart_icon_fill_inside_set(wd->img, !(wd->fill_outside));
+
+   evas_object_size_hint_min_get(obj, &minw, &minh);
+
    if (wd->no_scale) _els_smart_icon_scale_set(wd->img, 1.0);
    else
      {
