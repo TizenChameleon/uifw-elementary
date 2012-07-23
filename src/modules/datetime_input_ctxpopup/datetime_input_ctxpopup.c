@@ -225,7 +225,7 @@ field_value_display(Elm_Datetime_Module_Data *module_data, Evas_Object *obj)
    Ctxpopup_Module_Data *ctx_mod;
    Elm_Datetime_Field_Type  field_type;
    struct tm tim;
-   char buf[BUFF_SIZE];
+   char buf[BUFF_SIZE] = {0};
    const char *fmt;
 
    ctx_mod = (Ctxpopup_Module_Data *)module_data;
@@ -235,6 +235,14 @@ field_value_display(Elm_Datetime_Module_Data *module_data, Evas_Object *obj)
    field_type = (Elm_Datetime_Field_Type )evas_object_data_get(obj, "_field_type");
    fmt = ctx_mod->mod_data.field_format_get(ctx_mod->mod_data.base, field_type);
    strftime(buf, sizeof(buf), fmt, &tim);
+
+   // If a locale doesn't support AM/PM strings, set the default values
+   if ((buf[0] == 0) && (!strncmp(fmt, "%p", BUFF_SIZE) || strncmp(fmt, "%P", BUFF_SIZE)))
+     {
+         if (tim.tm_hour < 12) strncpy(buf, "AM", BUFF_SIZE);
+         else strncpy(buf, "PM", BUFF_SIZE);
+     }
+
    elm_object_text_set(obj, buf);
 }
 
