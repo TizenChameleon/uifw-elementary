@@ -695,6 +695,13 @@ _elm_win_obj_callback_hide(void *data, Evas *e __UNUSED__, Evas_Object *obj __UN
 }
 
 static void
+_elm_win_obj_callback_img_obj_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Win *win = data;
+   win->img_obj = NULL;
+}
+
+static void
 _elm_win_obj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Elm_Win *win = data;
@@ -766,6 +773,8 @@ _elm_win_obj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_inf
 
    if (win->img_obj)
      {
+        evas_object_event_callback_del_full
+           (win->img_obj, EVAS_CALLBACK_DEL, _elm_win_obj_callback_img_obj_del, win);
         win->img_obj = NULL;
      }
    else
@@ -802,15 +811,6 @@ _elm_win_obj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_inf
      }
 }
 
-static void
-_elm_win_obj_callback_img_obj_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Elm_Win *win = data;
-   if (!win->img_obj) return;
-   evas_object_event_callback_del_full
-      (win->img_obj, EVAS_CALLBACK_DEL, _elm_win_obj_callback_img_obj_del, win);
-   evas_object_del(win->img_obj);
-}
 
 static void
 _elm_win_obj_callback_parent_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
