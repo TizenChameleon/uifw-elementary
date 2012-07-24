@@ -129,6 +129,27 @@ _cbhm_item_count_get(Evas_Object *obj)
 {
 #ifdef HAVE_ELEMENTARY_X
    char *ret, count;
+   Ecore_X_Atom x_atom_cbhm_count_get = ecore_x_atom_get(ATOM_CBHM_COUNT_GET);
+   Ecore_X_Window cbhm_xwin = _cbhm_window_get();
+   DMSG("x_win: 0x%x, x_atom: %d\n", cbhm_xwin, x_atom_cbhm_count_get);
+   ret = _cbhm_reply_get(cbhm_xwin, x_atom_cbhm_count_get, NULL, NULL);
+   if (ret)
+     {
+        count = atoi(ret);
+        DMSG("count: %d\n", count);
+        free(ret);
+        return count;
+     }
+   DMSG("ret: 0x%x\n", ret);
+#endif
+   return -1;
+}
+/*
+int
+_cbhm_item_count_get(Evas_Object *obj)
+{
+#ifdef HAVE_ELEMENTARY_X
+   char *ret, count;
    if(_cbhm_msg_send(obj, MSG_CBHM_COUNT_GET))
      {
         DMSG("message send success\n");
@@ -149,6 +170,7 @@ _cbhm_item_count_get(Evas_Object *obj)
 #endif
    return -1;
 }
+*/
 
 #ifdef HAVE_ELEMENTARY_X
 Eina_Bool
@@ -165,6 +187,33 @@ _cbhm_item_get(Evas_Object *obj, int index, void *data_type, char **buf)
      *(int *)data_type = 0;
 
 #ifdef HAVE_ELEMENTARY_X
+   Ecore_X_Window cbhm_xwin = _cbhm_window_get();
+   char send_buf[20];
+   char *ret;
+
+   snprintf(send_buf, 20, "CBHM_ITEM%d", index);
+   Ecore_X_Atom x_atom_cbhm_item = ecore_x_atom_get(send_buf);
+   Ecore_X_Atom x_atom_item_type = 0;
+
+   DMSG("x_win: 0x%x, x_atom: %d\n", cbhm_xwin, x_atom_cbhm_item);
+   ret = _cbhm_reply_get(cbhm_xwin, x_atom_cbhm_item, &x_atom_item_type, NULL);
+   if (ret)
+     {
+        DMSG("data_type: %d, buf: %s\n", x_atom_item_type, ret);
+        if (buf)
+          *buf = ret;
+        else
+          free(ret);
+
+        if (data_type)
+          *data_type = x_atom_item_type;
+
+        Ecore_X_Atom x_atom_cbhm_error = ecore_x_atom_get(ATOM_CBHM_ERROR);
+        if (x_atom_item_type == x_atom_cbhm_error)
+          return EINA_FALSE;
+     }
+   DMSG("ret: 0x%x\n", ret);
+/*
    Ecore_X_Window xwin = ecore_evas_software_x11_window_get(
       ecore_evas_ecore_evas_get(evas_object_evas_get(obj)));
    char send_buf[20];
@@ -195,9 +244,27 @@ _cbhm_item_get(Evas_Object *obj, int index, void *data_type, char **buf)
           }
         DMSG("ret: 0x%x\n", ret);
      }
+*/
 #endif
    return EINA_FALSE;
 }
+
+#ifdef HAVE_ELEMENTARY_X
+Eina_Bool
+_cbhm_item_set(Evas_Object *obj, Ecore_X_Atom data_type, char *item_data)
+{
+   Ecore_X_Window x_cbhm_win = _cbhm_window_get();
+   Ecore_X_Atom x_atom_cbhm_item = ecore_x_atom_get(ATOM_CBHM_ITEM);
+   ecore_x_window_prop_property_set(x_cbhm_win, x_atom_cbhm_item, data_type, 8, item_data, strlen(item_data) + 1);
+   ecore_x_sync();
+   if (_cbhm_msg_send(obj, "SET_ITEM"))
+     {
+        DMSG("message send success\n");
+        return EINA_TRUE;
+     }
+   return EINA_FALSE;
+}
+#endif
 
 unsigned int
 _cbhm_serial_number_get()
