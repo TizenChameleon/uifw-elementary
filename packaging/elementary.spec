@@ -1,7 +1,7 @@
 #sbs-git:slp/pkgs/e/elementary elementary 1.0.0+svn.70492slp2+build11
 Name:       elementary
 Summary:    EFL toolkit for small touchscreens
-Version:    1.0.0+svn.70492slp2+build17
+Version:    1.0.0+svn.70492slp2+build18
 Release:    1
 Group:      System/Libraries
 License:    LGPLv2.1
