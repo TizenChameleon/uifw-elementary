@@ -1056,6 +1056,8 @@ _reorder_item_move_animator_cb(void *data)
    double tt, t;
    Evas_Coord dx, dy;
 
+   if (!it || !it->item) return ECORE_CALLBACK_CANCEL;
+
    tt = REORDER_EFFECT_TIME;
    t = ((0.0 > (t = ecore_loop_time_get()-it->item->moving_effect_start_time)) ? 0.0 : t);
    dx = ((it->item->tx - it->item->ox) / 10) * _elm_config->scale;
