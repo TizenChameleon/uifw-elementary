@@ -6,6 +6,9 @@
 #ifdef HAVE_ELEMENTARY_X
 #include <Ecore_X.h>
 #endif
+#ifdef SDB_ENABLE
+#include <Ecore_Ipc.h>
+#endif
 #ifdef HAVE_ELEMENTARY_FB
 #include <Ecore_Fb.h>
 #endif
