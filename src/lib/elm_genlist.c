@@ -1015,6 +1015,13 @@ _mouse_move(void        *data,
         if ((it->wd->reorder_mode) && (it->wd->reorder_it))
           {
              evas_object_geometry_get(it->wd->pan_smart, &ox, &oy, &ow, &oh);
+
+             if (ev->cur.canvas.y < (oy + (it->wd->reorder_it->item->h / 2)))
+               it->wd->reorder_fast = 1;
+             else if (ev->cur.canvas.y > (oy + oh - (it->wd->reorder_it->item->h  / 2)))
+               it->wd->reorder_fast = -1;
+             else it->wd->reorder_fast = 0;
+
              it_scrl_y = ev->cur.canvas.y - it->wd->reorder_it->dy;
 
              if (!it->wd->reorder_start_y)
@@ -1457,6 +1464,7 @@ _mouse_up(void        *data,
    if ((it->wd->reorder_mode) && (it->wd->reorder_it))
      {
         Evas_Coord it_scrl_y = ev->canvas.y - it->wd->reorder_it->dy;
+        it->wd->reorder_fast = 0;
 
         if (it->wd->reorder_rel && (it->wd->reorder_it->parent == it->wd->reorder_rel->parent))
           {
@@ -3220,6 +3228,28 @@ _changed_job(void *data)
 }
 
 static void
+_viewport_coord_get(Widget_Data *wd,
+                    Evas_Coord *vx,
+                    Evas_Coord *vy,
+                    Evas_Coord *vw,
+                    Evas_Coord *vh)
+{
+   Evas_Coord x, y, w, h;
+   EINA_SAFETY_ON_NULL_RETURN(wd);
+
+   elm_smart_scroller_child_pos_get(wd->scr, &x, &y);
+   elm_smart_scroller_child_viewport_size_get(wd->scr, &w, &h);
+
+   if (w > wd->minw) x -= ((w - wd->minw) / 2);
+   if (h > wd->minh) y -= ((h - wd->minh) / 2);
+   if (vx) *vx = x;
+   if (vy) *vy = y;
+   if (vw) *vw = w;
+   if (vh) *vh = h;
+}
+
+
+static void
 _pan_set(Evas_Object *obj,
          Evas_Coord   x,
          Evas_Coord   y)
@@ -3462,6 +3492,14 @@ _pan_calculate(Evas_Object *obj)
 
    if (!sd->wd->tree_effect_enabled || (sd->wd->move_effect_mode == ELM_GENLIST_TREE_EFFECT_NONE))
      _item_auto_scroll(sd->wd);
+
+   Evas_Coord vx, vy, vw, vh;
+   _viewport_coord_get(sd->wd, &vx, &vy, &vw, &vh);
+
+   if (sd->wd->reorder_fast == 1)
+	   elm_smart_scroller_child_region_show(sd->wd->scr, vx, vy - 10, vw, vh);
+   else if (sd->wd->reorder_fast == -1)
+	   elm_smart_scroller_child_region_show(sd->wd->scr, vx, vy + 10, vw, vh);
 
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
