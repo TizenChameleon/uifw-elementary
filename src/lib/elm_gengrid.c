@@ -2686,17 +2686,17 @@ elm_gengrid_item_show(Elm_Object_Item *it, Elm_Gengrid_Item_Scrollto_Type type)
      }
 
    if (wd->horizontal)
-     elm_smart_scroller_region_bring_in(_it->wd->scr,
-                                        ((_it->x - _it->item->prev_group) * wd->item_width) + (_it->item->prev_group * _it->wd->group_item_width) + minx,
-                                        _it->y * wd->item_height + miny,
-                                        _it->wd->item_width,
-                                        _it->wd->item_height);
+     elm_smart_scroller_region_show(_it->wd->scr,
+                                    ((_it->x - _it->item->prev_group) * wd->item_width) + (_it->item->prev_group * _it->wd->group_item_width) + minx,
+                                    _it->y * wd->item_height + miny,
+                                    _it->wd->item_width,
+                                    _it->wd->item_height);
    else
-     elm_smart_scroller_region_bring_in(_it->wd->scr,
-                                        _it->x * wd->item_width + minx,
-                                        ((_it->y - _it->item->prev_group) * wd->item_height) + (_it->item->prev_group * _it->wd->group_item_height) + miny,
-                                        _it->wd->item_width,
-                                        _it->wd->item_height);
+     elm_smart_scroller_region_show(_it->wd->scr,
+                                    _it->x * wd->item_width + minx,
+                                    ((_it->y - _it->item->prev_group) * wd->item_height) + (_it->item->prev_group * _it->wd->group_item_height) + miny,
+                                    _it->wd->item_width,
+                                    _it->wd->item_height);
 }
 
 EAPI void
