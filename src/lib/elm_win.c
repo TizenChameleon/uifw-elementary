@@ -25,6 +25,7 @@ struct _Elm_Win
 #ifdef HAVE_ELEMENTARY_X
    Ecore_X_Window xwin;
    Ecore_Event_Handler *client_message_handler;
+   Ecore_Event_Handler *property_handler;
 #endif
 #ifdef SDB_ENABLE
    Object_Dump_Mod *od_mod;
@@ -794,6 +795,8 @@ _elm_win_obj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_inf
 #ifdef HAVE_ELEMENTARY_X
    if (win->client_message_handler)
      ecore_event_handler_del(win->client_message_handler);
+   if (win->property_handler)
+     ecore_event_handler_del(win->property_handler);
 #endif
 #ifdef SDB_ENABLE
    if (win->sdb_server)
@@ -1073,6 +1076,7 @@ static void
 _elm_win_xwin_update(Elm_Win *win)
 {
    const char *s;
+   Elm_Win_Indicator_Mode mode;
 
    _elm_win_xwindow_get(win);
    if (win->parent)
@@ -1192,12 +1196,17 @@ _elm_win_xwin_update(Elm_Win *win)
      }
    ecore_x_e_virtual_keyboard_state_set
       (win->xwin, (Ecore_X_Virtual_Keyboard_State)win->kbdmode);
-   if (win->indmode == ELM_WIN_INDICATOR_SHOW)
-     ecore_x_e_illume_indicator_state_set
-     (win->xwin, ECORE_X_ILLUME_INDICATOR_STATE_ON);
-   else if (win->indmode == ELM_WIN_INDICATOR_HIDE)
-     ecore_x_e_illume_indicator_state_set
-     (win->xwin, ECORE_X_ILLUME_INDICATOR_STATE_OFF);
+
+   mode = ecore_x_e_illume_indicator_state_get(win->xwin);
+   if (mode != win->indmode)
+     {
+        if (mode == ELM_WIN_INDICATOR_SHOW)
+          ecore_x_e_illume_indicator_state_set
+          (win->xwin, ECORE_X_ILLUME_INDICATOR_STATE_ON);
+        else if (mode == ELM_WIN_INDICATOR_HIDE)
+          ecore_x_e_illume_indicator_state_set
+          (win->xwin, ECORE_X_ILLUME_INDICATOR_STATE_OFF);
+     }
 }
 #endif
 
@@ -1456,6 +1465,22 @@ _elm_win_client_message(void *data, int type __UNUSED__, void *event)
           }
      }
 #endif
+   return ECORE_CALLBACK_PASS_ON;
+}
+
+static Eina_Bool
+_elm_win_property_change(void *data, int type __UNUSED__, void *event)
+{
+   Elm_Win *win = data;
+   Ecore_X_Event_Window_Property *e = event;
+
+   if (e->atom == ECORE_X_ATOM_E_ILLUME_INDICATOR_STATE)
+     {
+        if (e->win == win->xwin)
+          {
+             win->indmode = ecore_x_e_illume_indicator_state_get(e->win);
+          }
+     }
    return ECORE_CALLBACK_PASS_ON;
 }
 #endif
@@ -2074,6 +2099,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 #ifdef HAVE_ELEMENTARY_X
              win->client_message_handler = ecore_event_handler_add
                 (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+             win->property_handler = ecore_event_handler_add
+                (ECORE_X_EVENT_WINDOW_PROPERTY, _elm_win_property_change, win);
 #endif
              FALLBACK_TRY("Sofware X11");
           }
@@ -2094,6 +2121,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 #ifdef HAVE_ELEMENTARY_X
              win->client_message_handler = ecore_event_handler_add
                 (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+             win->property_handler = ecore_event_handler_add
+                (ECORE_X_EVENT_WINDOW_PROPERTY, _elm_win_property_change, win);
 #endif
      }
         else if (ENGINE_COMPARE(ELM_SOFTWARE_8_X11))
@@ -2103,6 +2132,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 #ifdef HAVE_ELEMENTARY_X
              win->client_message_handler = ecore_event_handler_add
                 (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+             win->property_handler = ecore_event_handler_add
+                (ECORE_X_EVENT_WINDOW_PROPERTY, _elm_win_property_change, win);
 #endif
           }
 /* killed
@@ -2113,6 +2144,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 #ifdef HAVE_ELEMENTARY_X
              win->client_message_handler = ecore_event_handler_add
                 (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+             win->property_handler = ecore_event_handler_add
+                (ECORE_X_EVENT_WINDOW_PROPERTY, _elm_win_property_change, win);
 #endif
           }
  */
@@ -2136,6 +2169,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 #ifdef HAVE_ELEMENTARY_X
              win->client_message_handler = ecore_event_handler_add
                 (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+             win->property_handler = ecore_event_handler_add
+                (ECORE_X_EVENT_WINDOW_PROPERTY, _elm_win_property_change, win);
 #endif
           }
         else if (ENGINE_COMPARE(ELM_SOFTWARE_WIN32))
