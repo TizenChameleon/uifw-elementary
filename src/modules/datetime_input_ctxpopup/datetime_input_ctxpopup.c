@@ -16,6 +16,7 @@ struct _Ctxpopup_Module_Data
 {
    Elm_Datetime_Module_Data mod_data;
    Evas_Object *ctxpopup;
+   unsigned char still_in  : 1;
 };
 
 struct _DiskItem_Data
@@ -129,7 +130,7 @@ _ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
 }
 
 static void
-_field_clicked_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+_field_clicked_cb(void *data, Evas_Object *obj)
 {
    Ctxpopup_Module_Data *ctx_mod;
    Evas_Object *diskselector;
@@ -218,6 +219,78 @@ _field_clicked_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    evas_object_show(ctx_mod->ctxpopup);
 }
 
+static void
+_field_mouse_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+   Evas_Event_Mouse_Down *ev;
+   Ctxpopup_Module_Data *ctx_mod;
+
+   ev = event_info;
+   ctx_mod = (Ctxpopup_Module_Data *)data;
+   if (!ctx_mod || !ctx_mod->ctxpopup) return;
+
+   if (!(ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
+     {
+        ctx_mod->still_in = 1;
+     }
+}
+
+static void
+_field_mouse_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Mouse_Move *ev;
+   Ctxpopup_Module_Data *ctx_mod;
+
+   ev = event_info;
+   ctx_mod = (Ctxpopup_Module_Data *)data;
+   if (!ctx_mod || !ctx_mod->ctxpopup) return;
+
+   if (ctx_mod->still_in)
+     {
+
+        if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
+          ctx_mod->still_in = 0;
+        else
+          {
+             Evas_Coord x, y, w, h;
+
+             evas_object_geometry_get(obj, &x, &y, &w, &h);
+             if ((ev->cur.canvas.x < x) || (ev->cur.canvas.y < y) ||
+                 (ev->cur.canvas.x >= (x + w)) || (ev->cur.canvas.y >= (y + h)))
+               ctx_mod->still_in = 0;
+          }
+     }
+   else
+     {
+        if (!(ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
+          {
+             Evas_Coord x, y, w, h;
+
+             evas_object_geometry_get(obj, &x, &y, &w, &h);
+             if ((ev->cur.canvas.x >= x) && (ev->cur.canvas.y >= y) &&
+                 (ev->cur.canvas.x < (x + w)) && (ev->cur.canvas.y < (y + h)))
+               ctx_mod->still_in = 1;
+          }
+     }
+}
+
+static void
+_field_mouse_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Mouse_Up *ev;
+   Ctxpopup_Module_Data *ctx_mod;
+
+   ev = event_info;
+   ctx_mod = (Ctxpopup_Module_Data *)data;
+   if (!ctx_mod || !ctx_mod->ctxpopup) return;
+
+   if (ctx_mod->still_in)
+     {
+        _field_clicked_cb(ctx_mod, obj);
+     }
+   ctx_mod->still_in = 0;
+}
+
 // module fucns for the specific module type
 EAPI void
 field_value_display(Elm_Datetime_Module_Data *module_data, Evas_Object *obj)
@@ -263,12 +336,11 @@ field_create(Elm_Datetime_Module_Data *module_data, Elm_Datetime_Field_Type  fie
      }
    else
      {
-        field_obj = elm_entry_add(ctx_mod->mod_data.base);
-        elm_entry_single_line_set(field_obj, EINA_TRUE);
-        elm_entry_editable_set(field_obj, EINA_FALSE);
-        elm_entry_input_panel_enabled_set(field_obj, EINA_FALSE);
-        elm_entry_context_menu_disabled_set(field_obj, EINA_TRUE);
-        evas_object_smart_callback_add(field_obj, "clicked", _field_clicked_cb, ctx_mod);
+        field_obj = elm_label_add(ctx_mod->mod_data.base);
+        evas_object_event_callback_add(field_obj, EVAS_CALLBACK_MOUSE_DOWN, _field_mouse_down_cb, ctx_mod);
+        evas_object_event_callback_add(field_obj, EVAS_CALLBACK_MOUSE_MOVE, _field_mouse_move_cb, ctx_mod);
+        evas_object_event_callback_add(field_obj, EVAS_CALLBACK_MOUSE_UP, _field_mouse_up_cb, ctx_mod);
+        elm_object_style_set(field_obj,"datetime");
      }
    evas_object_data_set(field_obj, "_field_type", (void *)field_type);
    return field_obj;
