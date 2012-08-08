@@ -2442,6 +2442,10 @@ _item_unrealize_cb(Elm_Gen_Item *it)
    EINA_LIST_FREE(it->item->flip_content_objs, content)
      evas_object_del(content);
 
+   // unswallow VIEW(it) first then manipulate VIEW(it)
+   _decorate_item_unrealize(it);
+   if (it->wd->decorate_all_mode) _decorate_all_item_unrealize(it);
+
    if (it->item->nocache_once || it->item->nocache)
      {
         evas_object_del(VIEW(it));
@@ -2462,11 +2466,9 @@ _item_unrealize_cb(Elm_Gen_Item *it)
         _item_cache_add(it);
      }
 
-   _decorate_item_unrealize(it);
    it->states = NULL;
    it->realized = EINA_FALSE;
    it->want_unrealize = EINA_FALSE;
-   if (it->wd->decorate_all_mode) _decorate_all_item_unrealize(it);
 }
 
 static Eina_Bool
