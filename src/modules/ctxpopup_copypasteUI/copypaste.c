@@ -378,6 +378,7 @@ obj_longpress(Evas_Object *obj)
              evas_object_smart_callback_add(ext_mod->popup, "dismissed", _ctxpopup_dismissed_cb, NULL);
              evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL, _entry_del_cb, ext_mod->popup);
              evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _entry_hide_cb, ext_mod->popup);
+             elm_ctxpopup_direction_priority_set(ext_mod->popup, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_RIGHT);
           }
         /*currently below theme not used,when guideline comes a new theme can be created if required*/
         elm_object_style_set(ext_mod->popup,"extended/entry");
