@@ -305,26 +305,6 @@ if test "x$want_elementary_x" = "xyes" -a "x$have_elementary_x" = "xno"; then
     AC_MSG_ERROR([ecore-x support requested, but not found by pkg-config.])
 fi
 
-have_sdbd="no"
-want_sdb_enable="yes"
-AC_ARG_ENABLE([sdbd],
-        [AC_HELP_STRING([--disable-sdb], [disable sdbd support, @<:@default=detect@:>@])],
-        [want_sdb_enable=$enableval], [])
-
-if test "x$have_elementary_x" = "xyes" -a "x$want_sdb_enable" != "xno"; then
-   PKG_CHECK_MODULES([SDBD],
-      [ecore-ipc >= 1.0.999],
-      [
-       AC_DEFINE(SDB_ENABLE, 1, [sdb enable])
-       have_sdb="yes"
-       requirement_elm="ecore-ipc >= 1.0.999 ${requirement_elm}"
-      ],
-      [have_sdb="no"]
-   )
-else
-    have_sdb="no"
-fi
-
 have_elementary_fb="no"
 want_elementary_fb="auto"
 AC_ARG_ENABLE([ecore-fb],
@@ -737,7 +717,6 @@ src/modules/datetime_input_ctxpopup/Makefile
 src/modules/test_entry/Makefile
 src/modules/test_map/Makefile
 src/modules/ctxpopup_copypasteUI/Makefile
-src/modules/object_dump/Makefile
 src/edje_externals/Makefile
 src/examples/Makefile
 data/Makefile

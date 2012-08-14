@@ -6,5 +6,4 @@ test_entry \
 ctxpopup_copypasteUI \
 test_map \
 access_output \
-datetime_input_ctxpopup \
-object_dump
+datetime_input_ctxpopup

@@ -3,19 +3,6 @@
 
 typedef struct _Elm_Win Elm_Win;
 
-#ifdef SDB_ENABLE
-typedef struct _Object_Dump_Mod Object_Dump_Mod;
-
-struct _Object_Dump_Mod
-{
-   Eina_List *(*tree_create) (Evas_Object *root);
-   void (*tree_free) (Eina_List *tree);
-   char *(*tree_string_get) (Eina_List *tree);
-   char *(*tree_string_get_for_sdb) (Eina_List *tree);
-   char *(*command_for_sdb) (Eina_List *tree, char *data);
-};
-#endif
-
 struct _Elm_Win
 {
    Ecore_Evas *ee;
@@ -26,11 +13,6 @@ struct _Elm_Win
    Ecore_X_Window xwin;
    Ecore_Event_Handler *client_message_handler;
    Ecore_Event_Handler *property_handler;
-#endif
-#ifdef SDB_ENABLE
-   Object_Dump_Mod *od_mod;
-   Ecore_Ipc_Server *sdb_server;
-   Ecore_Event_Handler *sdb_server_data_handler, *sdb_server_del_handler;
 #endif
    Ecore_Job *deferred_resize_job;
    Ecore_Job *deferred_child_eval_job;
@@ -447,20 +429,6 @@ _elm_win_focus_out(Ecore_Evas *ee)
      {
         /* do nothing */
      }
-#ifdef SDB_ENABLE
-   if (win->sdb_server)
-     {
-        if (win->od_mod) free(win->od_mod);
-        ecore_event_handler_del(win->sdb_server_data_handler);
-        ecore_event_handler_del(win->sdb_server_del_handler);
-        ecore_ipc_shutdown();
-
-        win->od_mod = NULL;
-        win->sdb_server = NULL;
-        win->sdb_server_data_handler = NULL;
-        win->sdb_server_del_handler = NULL;
-     }
-#endif
 }
 
 static void
@@ -797,20 +765,6 @@ _elm_win_obj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_inf
      ecore_event_handler_del(win->client_message_handler);
    if (win->property_handler)
      ecore_event_handler_del(win->property_handler);
-#endif
-#ifdef SDB_ENABLE
-   if (win->sdb_server)
-     {
-        if (win->od_mod) free(win->od_mod);
-        ecore_event_handler_del(win->sdb_server_data_handler);
-        ecore_event_handler_del(win->sdb_server_del_handler);
-        ecore_ipc_shutdown();
-
-        win->od_mod = NULL;
-        win->sdb_server = NULL;
-        win->sdb_server_data_handler = NULL;
-        win->sdb_server_del_handler = NULL;
-     }
 #endif
    // FIXME: Why are we flushing edje on every window destroy ??
    //   edje_file_cache_flush();
@@ -1304,101 +1258,6 @@ _elm_win_translate(void)
       elm_widget_translate(obj);
 }
 
-#ifdef SDB_ENABLE
-static int
-_elm_win_send_message_to_sdb(Elm_Win *win, char *msg)
-{
-   if (win->sdb_server && msg)
-     return ecore_ipc_server_send(win->sdb_server, 0, 0, 0, 0, 0, msg, strlen(msg)+1);
-
-   return 0;
-}
-
-static Eina_Bool
-_elm_win_sdb_server_sent(void *data, int type __UNUSED__, void *event)
-{
-   Elm_Win *win = data;
-   Ecore_Ipc_Event_Server_Data *e;
-   e = (Ecore_Ipc_Event_Server_Data *) event;
-
-   if (win->sdb_server != e->server) return EINA_FALSE;
-   if (!win->od_mod) return EINA_FALSE;
-
-   Object_Dump_Mod *mod = win->od_mod;
-   char *msg = strdup((char *)e->data);
-   const char *command = strtok(msg,"=");
-   char *text = NULL;
-   Eina_List *tree = NULL;
-
-   if (mod->tree_create)
-      tree = mod->tree_create(win->win_obj);
-
-   if (tree)
-     {
-        if (!strcmp(command, "AT+DUMPWND"))
-          {
-             if (mod->tree_string_get_for_sdb)
-                text = mod->tree_string_get_for_sdb(tree);
-          }
-        else if (!strcmp(command, "AT+GETPARAM") ||
-                 !strcmp(command, "AT+GETOTEXT") ||
-                 !strcmp(command, "AT+CLRENTRY") ||
-                 !strcmp(command, "AT+SETENTRY"))
-          {
-             if (mod->command_for_sdb)
-                text = mod->command_for_sdb(tree, e->data);
-          }
-        else
-           text = strdup("Invaild Command!!");
-
-        _elm_win_send_message_to_sdb(win, text);
-        if (mod->tree_free) mod->tree_free(tree);
-        if (text) free(text);
-     }
-   else
-      return EINA_FALSE;
-
-   return EINA_TRUE;
-}
-
-static Eina_Bool
-_elm_win_sdb_server_del(void *data, int type __UNUSED__, void *event __UNUSED__)
-{
-   Elm_Win *win = data;
-
-   if (win->od_mod) free(win->od_mod);
-   ecore_event_handler_del(win->sdb_server_data_handler);
-   ecore_event_handler_del(win->sdb_server_del_handler);
-   ecore_ipc_shutdown();
-
-   win->od_mod = NULL;
-   win->sdb_server = NULL;
-   win->sdb_server_data_handler = NULL;
-   win->sdb_server_del_handler = NULL;
-
-   return EINA_TRUE;
-}
-
-static Object_Dump_Mod *
-_object_dump_mod_init()
-{
-   Elm_Module *mod = NULL;
-   mod = _elm_module_find_as("win/api");
-   if (!mod) return NULL;
-
-   mod->api = malloc(sizeof(Object_Dump_Mod));
-   if (!mod->api) return NULL;
-
-   ((Object_Dump_Mod *)(mod->api))->tree_create = _elm_module_symbol_get(mod, "tree_create");
-   ((Object_Dump_Mod *)(mod->api))->tree_free = _elm_module_symbol_get(mod, "tree_free");
-   ((Object_Dump_Mod *)(mod->api))->tree_string_get = _elm_module_symbol_get(mod, "tree_string_get");
-   ((Object_Dump_Mod *)(mod->api))->tree_string_get_for_sdb = _elm_module_symbol_get(mod, "tree_string_get_for_sdb");
-   ((Object_Dump_Mod *)(mod->api))->command_for_sdb = _elm_module_symbol_get(mod, "command_for_sdb");
-
-   return mod->api;
-}
-#endif
-
 #ifdef HAVE_ELEMENTARY_X
 static Eina_Bool
 _elm_win_client_message(void *data, int type __UNUSED__, void *event)
@@ -1436,35 +1295,6 @@ _elm_win_client_message(void *data, int type __UNUSED__, void *event)
                }
           }
      }
-#ifdef SDB_ENABLE
-   else if (e->message_type == ECORE_X_ATOM_SDB_SERVER_CONNECT)
-     {
-        if ((unsigned)e->data.l[0] == win->xwin)
-          {
-             ecore_ipc_init();
-             win->od_mod = _object_dump_mod_init();
-
-             win->sdb_server = ecore_ipc_server_connect(ECORE_IPC_LOCAL_SYSTEM, "sdb", 0, NULL);
-             win->sdb_server_data_handler = ecore_event_handler_add(ECORE_IPC_EVENT_SERVER_DATA, _elm_win_sdb_server_sent, win);
-             win->sdb_server_del_handler = ecore_event_handler_add(ECORE_IPC_EVENT_SERVER_DEL, _elm_win_sdb_server_del, win);
-          }
-     }
-   else if (e->message_type == ECORE_X_ATOM_SDB_SERVER_DISCONNECT)
-     {
-        if ((unsigned)e->data.l[0] == win->xwin)
-          {
-             if (win->od_mod) free(win->od_mod);
-             ecore_event_handler_del(win->sdb_server_data_handler);
-             ecore_event_handler_del(win->sdb_server_del_handler);
-             ecore_ipc_shutdown();
-
-             win->od_mod = NULL;
-             win->sdb_server = NULL;
-             win->sdb_server_data_handler = NULL;
-             win->sdb_server_del_handler = NULL;
-          }
-     }
-#endif
    return ECORE_CALLBACK_PASS_ON;
 }
 
