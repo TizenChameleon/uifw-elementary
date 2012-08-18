@@ -375,7 +375,7 @@ group { name: "elm/genlist/item/default/default";
          target:  "disclip";
       }
       program {
-         name:    "go_reorder_disabled";
+         name:    "reorder_end";
          signal:  "elm,state,reorder,disabled";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
@@ -383,7 +383,7 @@ group { name: "elm/genlist/item/default/default";
          transition: DECELERATE 0.5;
       }
       program {
-         name:    "go_reorder_enabled";
+         name:    "reorder_start";
          signal:  "elm,state,reorder,enabled";
          source:  "elm";
          action:  STATE_SET "enabled" 0.0;
@@ -1398,7 +1398,7 @@ group { name: "elm/genlist/tree/default/default";
          target:  "disclip";
       }
       program {
-         name:    "go_reorder_disabled";
+         name:    "reorder_end";
          signal:  "elm,state,reorder,disabled";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
@@ -1406,7 +1406,7 @@ group { name: "elm/genlist/tree/default/default";
          transition: DECELERATE 0.5;
       }
       program {
-         name:    "go_reorder_enabled";
+         name:    "reorder_start";
          signal:  "elm,state,reorder,enabled";
          source:  "elm";
          action:  STATE_SET "enabled" 0.0;
@@ -9991,7 +9991,7 @@ group { name: "elm/genlist/tree/tree_effect/default";
          target:  "disclip";
       }
       program {
-         name:    "go_reorder_disabled";
+         name:    "reorder_end";
          signal:  "elm,state,reorder,disabled";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
@@ -9999,7 +9999,7 @@ group { name: "elm/genlist/tree/tree_effect/default";
          transition: DECELERATE 0.5;
       }
       program {
-         name:    "go_reorder_enabled";
+         name:    "reorder_start";
          signal:  "elm,state,reorder,enabled";
          source:  "elm";
          action:  STATE_SET "enabled" 0.0;

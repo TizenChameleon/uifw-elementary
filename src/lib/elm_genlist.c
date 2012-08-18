@@ -962,6 +962,7 @@ _mouse_move(void        *data,
             void        *event_info)
 {
    Elm_Gen_Item *it = data;
+   EINA_SAFETY_ON_NULL_RETURN(it);
    Evas_Event_Mouse_Move *ev = event_info;
    Evas_Coord minw = 0, minh = 0, x, y, dx, dy, adx, ady;
    Evas_Coord ox, oy, ow, oh, it_scrl_y, y_pos;
@@ -1150,8 +1151,7 @@ _long_press(void *data)
              return ECORE_CALLBACK_RENEW;
           }
 
-        if (!it->wd->decorate_all_mode)
-          edje_object_signal_emit(VIEW(it), "elm,state,reorder,enabled", "elm");
+        edje_object_signal_emit(VIEW(it), "elm,state,reorder,enabled", "elm");
      }
    return ECORE_CALLBACK_CANCEL;
 }
@@ -1335,6 +1335,36 @@ _multi_move(void        *data,
 }
 
 static void
+_item_unfocusable_set(Elm_Gen_Item *it, Eina_Bool unfocus)
+{
+   Eina_List *l;
+   Evas_Object *item_obj;
+   Evas_Object *obj = WIDGET(it);
+   if (!it->can_focus)
+     {
+        EINA_LIST_FOREACH(it->content_objs, l, item_obj)
+          {
+             if (unfocus) elm_widget_focused_object_clear(item_obj);
+             elm_widget_tree_unfocusable_set(item_obj, unfocus);
+          }
+        if (elm_widget_type_get(obj) == _genlist)
+          {
+             EINA_LIST_FOREACH(it->item->flip_content_objs, l, item_obj)
+               {
+                  if (unfocus) elm_widget_focused_object_clear(item_obj);
+                  elm_widget_tree_unfocusable_set(item_obj, unfocus);
+               }
+             EINA_LIST_FOREACH(it->item->deco_all_content_objs, l, item_obj)
+               {
+                  if (unfocus) elm_widget_focused_object_clear(item_obj);
+                  elm_widget_tree_unfocusable_set(item_obj, unfocus);
+               }
+          }
+        it->can_focus = !unfocus;
+     }
+}
+
+static void
 _mouse_down(void        *data,
             Evas        *evas __UNUSED__,
             Evas_Object *obj,
@@ -1343,29 +1373,10 @@ _mouse_down(void        *data,
    Elm_Gen_Item *it = data;
    Evas_Event_Mouse_Down *ev = event_info;
    Evas_Coord x, y;
-   Eina_List *l;
-   Evas_Object *item_obj;
 
    if (ev->button != 1) return;
-   if (!it->can_focus)
-     {
-        EINA_LIST_FOREACH(it->content_objs, l, item_obj)
-          {
-             elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
-          }
-        if (elm_widget_type_get(obj) == _genlist)
-          {
-             EINA_LIST_FOREACH(it->item->flip_content_objs, l, item_obj)
-               {
-                  elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
-               }
-             EINA_LIST_FOREACH(it->item->deco_all_content_objs, l, item_obj)
-               {
-                  elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
-               }
-          }
-        it->can_focus = EINA_TRUE;
-     }
+
+   _item_unfocusable_set(it, EINA_FALSE);
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
      {
         it->wd->on_hold = EINA_TRUE;
@@ -2288,6 +2299,14 @@ _item_realize(Elm_Gen_Item *it,
      }
 
    _item_order_update(EINA_INLIST_GET(it), in);
+
+   if (!(it->deco_all_view) && (it->item->type != ELM_GENLIST_ITEM_GROUP))
+     {
+        if (it->wd->reorder_mode)
+           edje_object_signal_emit(VIEW(it), "elm,state,reorder,mode_set", "elm");
+        else
+           edje_object_signal_emit(VIEW(it), "elm,state,reorder,mode_unset", "elm");
+     }
 
    treesize = edje_object_data_get(VIEW(it), "treesize");
    if (treesize) tsize = atoi(treesize);
@@ -3823,6 +3842,14 @@ _decorate_all_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
    if (effect_on) edje_object_signal_emit(it->deco_all_view, "elm,state,decorate,enabled,effect", "elm");
    else edje_object_signal_emit(it->deco_all_view, "elm,state,decorate,enabled", "elm");
 
+   if (it->wd->reorder_mode)
+     {
+        edje_object_signal_emit(VIEW(it), "elm,state,reorder,mode_unset", "elm");
+        edje_object_signal_emit(it->deco_all_view, "elm,state,reorder,mode_set", "elm");
+     }
+   else
+      edje_object_signal_emit(it->deco_all_view, "elm,state,reorder,mode_unset", "elm");
+
    _item_mouse_callbacks_del(it, VIEW(it));
    _item_mouse_callbacks_add(it, it->deco_all_view);
 
@@ -4000,9 +4027,6 @@ elm_genlist_add(Evas_Object *parent)
 void
 _item_select(Elm_Gen_Item *it)
 {
-   Eina_List *l;
-   Evas_Object *obj = WIDGET(it);
-   Evas_Object *item_obj;
 
    if ((it->generation < it->wd->generation) || (it->decorate_it_set) ||
        (it->select_mode == ELM_OBJECT_SELECT_MODE_NONE) ||
@@ -4015,34 +4039,12 @@ _item_select(Elm_Gen_Item *it)
      }
    else if (it->wd->select_mode != ELM_OBJECT_SELECT_MODE_ALWAYS) return;
 
-   evas_object_ref(obj);
    it->walking++;
    it->wd->walking++;
-   if (it->wd->last_selected_item &&
+   if ((it->wd->last_selected_item) &&
        (it != (Elm_Gen_Item *) it->wd->last_selected_item))
-     {
-        Elm_Gen_Item *_lsit = (Elm_Gen_Item *)it->wd->last_selected_item;
+      _item_unfocusable_set((Elm_Gen_Item *)it->wd->last_selected_item, EINA_TRUE);
 
-        EINA_LIST_FOREACH(_lsit->content_objs, l, item_obj)
-          {
-             elm_widget_focused_object_clear(item_obj);
-             elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
-          }
-        if (elm_widget_type_get(obj) == _genlist)
-          {
-             EINA_LIST_FOREACH(_lsit->item->flip_content_objs, l, item_obj)
-               {
-                  elm_widget_focused_object_clear(item_obj);
-                  elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
-               }
-             EINA_LIST_FOREACH(_lsit->item->deco_all_content_objs, l, item_obj)
-               {
-                  elm_widget_focused_object_clear(item_obj);
-                  elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
-               }
-          }
-        _lsit->can_focus = EINA_FALSE;
-     }
    if (it->func.func) it->func.func((void *)it->func.data, WIDGET(it), it);
    if (it->generation == it->wd->generation)
      evas_object_smart_callback_call(WIDGET(it), SIG_SELECTED, it);
@@ -4063,7 +4065,6 @@ _item_select(Elm_Gen_Item *it)
         else
           it->wd->last_selected_item = (Elm_Object_Item *)it;
      }
-   evas_object_unref(obj);
 }
 
 static Evas_Object *
@@ -6107,6 +6108,8 @@ elm_genlist_decorate_mode_set(Evas_Object *obj, Eina_Bool decorated)
                }
           }
      }
+   eina_list_free(list);
+
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    wd->calc_job = ecore_job_add(_calc_job, wd);
 }
@@ -6115,10 +6118,26 @@ EAPI void
 elm_genlist_reorder_mode_set(Evas_Object *obj,
                              Eina_Bool    reorder_mode)
 {
+   Eina_List *list, *l;
+   Elm_Gen_Item *it;
+
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    wd->reorder_mode = !!reorder_mode;
+
+   list = elm_genlist_realized_items_get(obj);
+   EINA_LIST_FOREACH(list, l, it)
+     {
+        if (it->item->type != ELM_GENLIST_ITEM_GROUP)
+          {
+             if (wd->reorder_mode)
+                edje_object_signal_emit(VIEW(it), "elm,state,reorder,mode_set", "elm");
+             else
+                edje_object_signal_emit(VIEW(it), "elm,state,reorder,mode_unset", "elm");
+          }
+     }
+   eina_list_free(list);
 }
 
 EAPI Eina_Bool
