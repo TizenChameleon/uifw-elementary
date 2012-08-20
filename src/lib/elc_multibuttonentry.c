@@ -1255,7 +1255,6 @@ _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv)
           {
              minh += cmaxh;
              cw = 0;
-             cmaxh = 0;
           }
         cw += ww;
         if (cmaxh < mnh) cmaxh = mnh;
@@ -1299,7 +1298,6 @@ _calculate_item_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj
           {
              if (local_index > obj_index) return cmaxh;
              cw = 0;
-             cmaxh = 0;
           }
 
         cw += ww;
@@ -1384,7 +1382,6 @@ _box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data __UNUSED__
           {
              ch += cmaxh;
              cw = 0;
-             cmaxh = 0;
           }
 
         evas_object_move(obj,
