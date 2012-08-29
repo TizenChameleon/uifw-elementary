@@ -1948,48 +1948,9 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                             if ((_elm_config->thumbscroll_friction > 0.0) &&
                                 (vel > _elm_config->thumbscroll_momentum_threshold))
                               {
-                                 int minx, miny, mx, my, px, py;
-                                 sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
-                                 sd->pan_func.max_get(sd->pan_obj, &mx, &my);
-                                 sd->pan_func.get(sd->pan_obj, &px, &py);
                                  sd->down.dx = ((double)dx / at);
                                  sd->down.dy = ((double)dy / at);
-                                 if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
-                                     ((sd->down.dx < 0) && (sd->down.pdx < 0)))
-                                   if (px > minx && px < mx)
-                                     sd->down.dx += (double)sd->down.pdx * 1.5; // FIXME: * 1.5 - probably should be config
-                                 if (((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
-                                     ((sd->down.dy < 0) && (sd->down.pdy < 0)))
-                                   if (py > miny && py < my)
-                                     sd->down.dy += (double)sd->down.pdy * 1.5; // FIXME: * 1.5 - probably should be config
-                                 if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
-                                     ((sd->down.dx < 0) && (sd->down.pdx < 0)) ||
-                                     ((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
-                                     ((sd->down.dy < 0) && (sd->down.pdy < 0)))
-                                   {
-                                      double tt = ecore_loop_time_get();
-                                      double dtt = tt - sd->down.anim_start;
-
-                                      if (dtt < 0.0) dtt = 0.0;
-                                      else if (dtt > _elm_config->thumbscroll_friction)
-                                        dtt = _elm_config->thumbscroll_friction;
-                                      sd->down.extra_time = _elm_config->thumbscroll_friction - dtt;
-                                   }
-                                 else
-                                   sd->down.extra_time = 0.0;
-                                 elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &vw, &vh);
-                                 aw = abs(sd->down.dx);
-                                 if (aw  > vw*3)
-                                   {
-                                      if (sd->down.dx > 0) sd->down.dx = vw*3;
-                                      else sd->down.dx = -(vw*3);
-                                   }
-                                 ah = abs(sd->down.dy);
-                                 if (ah  > vh*3)
-                                   {
-                                      if (sd->down.dy > 0) sd->down.dy = vh*3;
-                                      else sd->down.dy = -(vh*3);
-                                   }
+                                 sd->down.extra_time = 0.0;
                                  sd->down.pdx = sd->down.dx;
                                  sd->down.pdy = sd->down.dy;
                                  ox = -sd->down.dx;
