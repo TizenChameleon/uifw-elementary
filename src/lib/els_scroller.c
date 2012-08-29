@@ -1923,6 +1923,19 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
 #ifdef SCROLLDBG
                        printf("------ %i %i\n", ev->canvas.x, ev->canvas.y);
 #endif
+                       for (i = 0; i < 60; i++)
+                         {
+                            dt = t - sd->down.history[i].timestamp;
+                            if (dt > 0.2) break;
+#ifdef SCROLLDBG
+                            printf("H: %i %i @ %1.3f\n",
+                                   sd->down.history[i].x,
+                                   sd->down.history[i].y, dt);
+#endif
+                            at += dt;
+                            ax += sd->down.history[i].x;
+                            ay += sd->down.history[i].y;
+                         }
                        ax /= (i + 1);
                        ay /= (i + 1);
                        at /= (i + 1);
