@@ -227,7 +227,7 @@ _cut(void *data, Evas_Object *obj, void *event_info)
 
    ext_mod->cut(data,obj,event_info);
    _ctxpopup_hide(obj);
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -237,7 +237,7 @@ _copy(void *data, Evas_Object *obj, void *event_info)
 
    ext_mod->copy(data,obj,event_info);
    _ctxpopup_hide(obj);
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -247,7 +247,7 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
 
    ext_mod->cancel(data,obj,event_info);
    _ctxpopup_hide(obj);
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -317,7 +317,7 @@ _ctxpopup_dismissed_cb(void *data, Evas_Object *o __UNUSED__, void *event_info _
 {
    if (!ext_mod) return;
 
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 // module api funcs needed
@@ -392,7 +392,7 @@ obj_longpress(Evas_Object *obj)
              evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _entry_hide_cb, ext_mod->popup);
           }
         /*currently below theme not used,when guideline comes a new theme can be created if required*/
-        elm_object_style_set(ext_mod->popup,"extended/entry");
+        //elm_object_style_set(ext_mod->popup,"extended/entry");
         context_menu_orientation = edje_object_data_get
            (ext_mod->ent, "context_menu_orientation");
         if ((context_menu_orientation) &&
@@ -509,7 +509,7 @@ obj_longpress(Evas_Object *obj)
           }
         if (ext_mod->popup && added_item)
           {
-             elm_object_scroll_freeze_push(ext_mod->popup);
+             //elm_object_scroll_freeze_push(ext_mod->popup);
              _ctxpopup_position(obj);
              evas_object_show(ext_mod->popup);
              _ctxpopup_position(obj);
