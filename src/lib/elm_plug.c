@@ -12,6 +12,7 @@ static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
+static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static const char SIG_CLICKED[] = "clicked";
@@ -37,6 +38,8 @@ _del_pre_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
+   if (!wd->img) return;
+   evas_object_event_callback_del_full(wd->img, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
    evas_object_del(wd->img);
 }
 
@@ -56,9 +59,22 @@ _sizing_eval(Evas_Object *obj)
    Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
 
    if (!wd) return;
+   if (!wd->img) return;
    //TODO: get socket object size
+
+   evas_object_size_hint_min_get(wd->img, &minw, &minh);
+   evas_object_size_hint_max_get(wd->img, &maxw, &maxh);
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, maxw, maxh);
+}
+
+static void
+_changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (obj != wd->img) return;
+   _sizing_eval(data);
 }
 
 static void
@@ -101,7 +117,8 @@ elm_plug_add(Evas_Object *parent)
    if (!ee) return NULL;
    wd->img = ecore_evas_extn_plug_new(ee);
    if (!wd->img) return NULL;
-
+   evas_object_event_callback_add(wd->img, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                  _changed_size_hints, obj);
    evas_object_event_callback_add(wd->img, EVAS_CALLBACK_MOUSE_UP,
                                   _mouse_up, obj);
    elm_widget_resize_object_set(obj, wd->img);
