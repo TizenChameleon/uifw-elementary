@@ -122,6 +122,7 @@ _ctxpopup_position(Evas_Object *obj)
    if(!ext_mod) return;
 
    Evas_Coord cx, cy, cw, ch, x, y, w, h;
+   elm_ctxpopup_direction_priority_set(ext_mod->popup, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_RIGHT);
    if (!edje_object_part_text_selection_geometry_get(ext_mod->ent, "elm.text", &x, &y, &w, &h))
      {
         evas_object_geometry_get(ext_mod->ent, &x, &y, NULL, NULL);
@@ -177,6 +178,17 @@ _ctxpopup_position(Evas_Object *obj)
           }
         cx = x + (w / 2);
         cy = y + (h / 2);
+        Elm_Ctxpopup_Direction dir = elm_ctxpopup_direction_get(ext_mod->popup);
+        if (dir != ELM_CTXPOPUP_DIRECTION_UNKNOWN)
+          {
+             if (dir == ELM_CTXPOPUP_DIRECTION_UP)
+               cy = y + (h / 5);
+             else if (dir == ELM_CTXPOPUP_DIRECTION_DOWN)
+               {
+                  elm_ctxpopup_direction_priority_set(ext_mod->popup, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_RIGHT);
+                  cy = y + h;
+               }
+          }
         evas_object_move(ext_mod->popup, cx, cy);
      }
 }
@@ -215,7 +227,7 @@ _cut(void *data, Evas_Object *obj, void *event_info)
 
    ext_mod->cut(data,obj,event_info);
    _ctxpopup_hide(obj);
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -225,7 +237,7 @@ _copy(void *data, Evas_Object *obj, void *event_info)
 
    ext_mod->copy(data,obj,event_info);
    _ctxpopup_hide(obj);
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -235,7 +247,7 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
 
    ext_mod->cancel(data,obj,event_info);
    _ctxpopup_hide(obj);
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -305,7 +317,7 @@ _ctxpopup_dismissed_cb(void *data, Evas_Object *o __UNUSED__, void *event_info _
 {
    if (!ext_mod) return;
 
-   elm_object_scroll_freeze_pop(ext_mod->popup);
+   //elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 // module api funcs needed
@@ -378,10 +390,9 @@ obj_longpress(Evas_Object *obj)
              evas_object_smart_callback_add(ext_mod->popup, "dismissed", _ctxpopup_dismissed_cb, NULL);
              evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL, _entry_del_cb, ext_mod->popup);
              evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _entry_hide_cb, ext_mod->popup);
-             elm_ctxpopup_direction_priority_set(ext_mod->popup, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_RIGHT);
           }
         /*currently below theme not used,when guideline comes a new theme can be created if required*/
-        elm_object_style_set(ext_mod->popup,"extended/entry");
+        //elm_object_style_set(ext_mod->popup,"extended/entry");
         context_menu_orientation = edje_object_data_get
            (ext_mod->ent, "context_menu_orientation");
         if ((context_menu_orientation) &&
@@ -420,10 +431,18 @@ obj_longpress(Evas_Object *obj)
                   //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                }
              // end for cbhm
-             icon = elm_icon_add(ext_mod->popup);
-             snprintf(buf, sizeof(buf), "%s/images/copy&paste_icon_search.png", PACKAGE_DATA_DIR);
-             elm_icon_file_set(icon, buf, NULL);
-             added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _search_menu, obj);  // Search
+
+             const char *entry_str;
+             char *str;
+             entry_str = edje_object_part_text_get(ext_mod->ent, "elm.text");
+             str = _remove_tags(entry_str);
+             if (strcmp(str, "") != 0)
+               {
+                  icon = elm_icon_add(ext_mod->popup);
+                  snprintf(buf, sizeof(buf), "%s/images/copy&paste_icon_search.png", PACKAGE_DATA_DIR);
+                  elm_icon_file_set(icon, buf, NULL);
+                  added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _search_menu, obj);  // Search
+               }
           }
         else
           {
@@ -470,11 +489,19 @@ obj_longpress(Evas_Object *obj)
                        //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                     }
                   // end for cbhm
-                  icon = elm_icon_add(ext_mod->popup);
-                  snprintf(buf, sizeof(buf), "%s/images/copy&paste_icon_search.png", PACKAGE_DATA_DIR);
-                  elm_icon_file_set(icon, buf, NULL);
-                  added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _search_menu, obj);  // Search
-               }
+
+                  const char *entry_str;
+                  char *str;
+                  entry_str = edje_object_part_text_get(ext_mod->ent, "elm.text");
+                  str = _remove_tags(entry_str);
+                  if (strcmp(str, "") != 0)
+                    {
+                       icon = elm_icon_add(ext_mod->popup);
+                       snprintf(buf, sizeof(buf), "%s/images/copy&paste_icon_search.png", PACKAGE_DATA_DIR);
+                       elm_icon_file_set(icon, buf, NULL);
+                       added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _search_menu, obj);  // Search
+                    }
+              }
           }
         EINA_LIST_FOREACH(ext_mod->items, l, it)
           {
@@ -482,9 +509,10 @@ obj_longpress(Evas_Object *obj)
           }
         if (ext_mod->popup && added_item)
           {
-             elm_object_scroll_freeze_push(ext_mod->popup);
+             //elm_object_scroll_freeze_push(ext_mod->popup);
              _ctxpopup_position(obj);
              evas_object_show(ext_mod->popup);
+             _ctxpopup_position(obj);
              ext_mod->caller = obj;
              evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _entry_move_cb, ext_mod->popup);
              evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _entry_resize_cb, ext_mod->popup);
